@@ -31,5 +31,6 @@ ext{
     annotationVersion = "10.0-b28"
     retrofitVersion = "2.1.0"
     okhttpVersion = "3.4.1"
+    glideVersion = "4.5.0"
 }
 

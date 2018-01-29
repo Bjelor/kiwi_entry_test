@@ -1,33 +1,24 @@
 package com.kiwi.flightoffers.ui
 
+import android.os.Bundle
 import android.support.design.widget.Snackbar
-
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import com.kiwi.flightoffers.R
-import com.kiwi.flightoffers.api.Api
 import com.kiwi.flightoffers.model.CollectionResponse
 import com.kiwi.flightoffers.model.Flight
-
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_main.view.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.Serializable
-import javax.inject.Inject
 
 class MainActivity : BaseActivity() {
-
-    @Inject lateinit var api : Api
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
@@ -65,7 +56,7 @@ class MainActivity : BaseActivity() {
 
         if (mSectionsPagerAdapter?.flights?.isEmpty() == true) {
             showLoading()
-            api.getFlightOffers().enqueue(object : Callback<CollectionResponse<Flight>> {
+            skypickerApi.getFlightOffers().enqueue(object : Callback<CollectionResponse<Flight>> {
                 override fun onResponse(call: Call<CollectionResponse<Flight>>, response: Response<CollectionResponse<Flight>>) {
                     Log.d(TAG, response.toString())
                     hideLoading()
@@ -137,45 +128,18 @@ class MainActivity : BaseActivity() {
 
         override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(flights[position].cityTo)
+            // Return a FlightOfferFragment (defined as a static inner class below).
+            val flight = flights[position]
+
+            return FlightOfferFragment.newInstance(flight.cityTo, flight.price, flight.cityFrom, flight.flyFrom)
         }
 
         override fun getCount(): Int {
             return flights.size
         }
+
+
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    class PlaceholderFragment : Fragment() {
 
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_main, container, false)
-            rootView.section_label.text = arguments.getString(ARG_LABEL)
-            return rootView
-        }
-
-        companion object {
-            /**
-             * The fragment argument representing the section number for this
-             * fragment.
-             */
-            private val ARG_LABEL = "label"
-
-            /**
-             * Returns a new instance of this fragment for the given section
-             * number.
-             */
-            fun newInstance(label: String): PlaceholderFragment {
-                val fragment = PlaceholderFragment()
-                val args = Bundle()
-                args.putString(ARG_LABEL, label)
-                fragment.arguments = args
-                return fragment
-            }
-        }
-    }
 }

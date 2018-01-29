@@ -2,4 +2,7 @@
     <string name="app_name">Flight Offers</string>
     <string name="action_settings">Settings</string>
     <string name="section_format">Hello World from section: %1$d</string>
+
+    <string name="from_format">From: %1$s</string>
+    <string name="price_format">%1$s\$</string>
 </resources>

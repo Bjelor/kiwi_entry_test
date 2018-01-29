@@ -1,6 +1,5 @@
 package com.kiwi.flightoffers.model
 
-import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 /**
@@ -11,6 +10,7 @@ data class Flight (
         val id: String,
         val countryTo: Country,
         val countryFrom: Country,
+        val flyFrom: String,
         val cityFrom: String,
         val cityTo: String,
         val price: String,
