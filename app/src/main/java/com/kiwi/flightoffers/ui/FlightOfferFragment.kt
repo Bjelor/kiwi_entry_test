@@ -43,10 +43,13 @@ class FlightOfferFragment : BaseFragment() {
                     val url = response?.body()
                     if(!url.isNullOrEmpty() && isAdded && context != null)
                         Glide.with(context!!).load(url).into(view.cover)
+                    else
+                        view.cover.visibility = View.INVISIBLE
                 }
 
                 override fun onFailure(call: Call<String>?, t: Throwable?) {
                     Log.e(FlightOfferFragment.TAG, t?.message)
+                    view.cover.visibility = View.INVISIBLE
                 }
 
             })

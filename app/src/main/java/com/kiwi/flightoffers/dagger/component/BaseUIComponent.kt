@@ -5,6 +5,7 @@ import com.kiwi.flightoffers.api.ImageApi
 import com.kiwi.flightoffers.api.SkypickerApi
 import com.kiwi.flightoffers.dagger.UIScope
 import com.kiwi.flightoffers.ui.BaseActivity
+import com.kiwi.flightoffers.ui.BaseFragment
 import dagger.Component
 
 /**
@@ -21,5 +22,5 @@ interface BaseUIComponent {
 
     fun inject(activity: BaseActivity)
 
-    fun inject(fragment: Fragment)
+    fun inject(fragment: BaseFragment)
 }

@@ -26,11 +26,11 @@ abstract class BaseActivity : AppCompatActivity() {
         inject()
     }
 
-    fun getAppcomponent(): AppComponent = App.appComponent
+    fun getAppComponent(): AppComponent = App.appComponent
 
     private fun inject() {
         DaggerBaseUIComponent.builder()
-                .appComponent(getAppcomponent())
+                .appComponent(getAppComponent())
                 .build()
                 .inject(this)
     }
