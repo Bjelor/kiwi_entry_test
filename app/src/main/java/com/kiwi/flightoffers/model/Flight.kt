@@ -13,6 +13,7 @@ data class Flight (
         val flyFrom: String,
         val cityFrom: String,
         val cityTo: String,
+        val mapIdto: String,
         val price: String,
         val aTimeUTC: String,
         val dTimeUTC: String

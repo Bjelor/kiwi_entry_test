@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.kiwi.flightoffers.R
+import com.kiwi.flightoffers.api.ImageAPIUtils
+import com.kiwi.flightoffers.model.Flight
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
 import retrofit2.Call
@@ -33,26 +35,18 @@ class FlightOfferFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val iata = arguments?.getString(ARG_IATA)
+        if(!iata.isNullOrBlank()) {
+            val logoUrl = ImageAPIUtils.getFlightLogoUrl(iata!!)
+            Glide.with(context!!).load(logoUrl).into(view.airline_icon)
+        }
 
-        if(airline_icon.drawable == null && !iata.isNullOrBlank())
-            imageApi.getFlightLogo(iata!!).enqueue(object : Callback<String> {
-
-                override fun onResponse(call: Call<String>?, response: Response<String>?) {
-
-                    val url = response?.body()
-                    if(!url.isNullOrEmpty() && isAdded && context != null)
-                        Glide.with(context!!).load(url).into(view.cover)
-                    else
-                        view.cover.visibility = View.INVISIBLE
-                }
-
-                override fun onFailure(call: Call<String>?, t: Throwable?) {
-                    Log.e(FlightOfferFragment.TAG, t?.message)
-                    view.cover.visibility = View.INVISIBLE
-                }
-
-            })
+        val mapIdto = arguments?.getString(ARG_IDTO)
+        if(!mapIdto.isNullOrBlank()) {
+            val imageUrl = ImageAPIUtils.getDestinationImageUrl(mapIdto!!)
+            Glide.with(context!!).load(imageUrl).into(view.cover)
+        }
     }
 
     companion object {
@@ -66,18 +60,20 @@ class FlightOfferFragment : BaseFragment() {
         private val ARG_PRICE = "price"
         private val ARG_FROM = "from"
         private val ARG_IATA = "iata"
+        private val ARG_IDTO = "mapIdto"
 
         /**
          * Returns a new instance of this fragment for the given section
          * number.
          */
-        fun newInstance(label: String, price: String, from: String, iata: String): FlightOfferFragment {
+        fun newInstance(flight: Flight): FlightOfferFragment {
             val fragment = FlightOfferFragment()
             val args = Bundle()
-            args.putString(ARG_LABEL, label)
-            args.putString(ARG_PRICE, price)
-            args.putString(ARG_FROM, from)
-            args.putString(ARG_IATA, iata)
+            args.putString(ARG_LABEL, flight.cityTo)
+            args.putString(ARG_PRICE, flight.price)
+            args.putString(ARG_FROM, flight.cityFrom)
+            args.putString(ARG_IATA, flight.flyFrom)
+            args.putString(ARG_IDTO, flight.mapIdto)
             fragment.arguments = args
             return fragment
         }

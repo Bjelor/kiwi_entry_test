@@ -131,7 +131,7 @@ class MainActivity : BaseActivity() {
             // Return a FlightOfferFragment (defined as a static inner class below).
             val flight = flights[position]
 
-            return FlightOfferFragment.newInstance(flight.cityTo, flight.price, flight.cityFrom, flight.flyFrom)
+            return FlightOfferFragment.newInstance(flight)
         }
 
         override fun getCount(): Int {

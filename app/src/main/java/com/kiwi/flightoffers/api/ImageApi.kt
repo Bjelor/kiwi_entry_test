@@ -11,10 +11,7 @@ import retrofit2.http.Path
 interface ImageApi {
 
     companion object {
-        const val BASE_URL = "https://images.kiwi.com/airlines/64/"
+        const val BASE_URL = "https://images.kiwi.com/"
     }
-
-    @GET("{iata}.png")
-    fun getFlightLogo(@Path("iata") iata: String): Call<String>
 
 }
