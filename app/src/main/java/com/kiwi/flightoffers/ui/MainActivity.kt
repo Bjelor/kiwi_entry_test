@@ -5,14 +5,21 @@ import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import com.google.gson.JsonObject
+import com.google.gson.reflect.TypeToken
 import com.kiwi.flightoffers.R
+import com.kiwi.flightoffers.api.SkypickerAPIUtils
 import com.kiwi.flightoffers.model.CollectionResponse
 import com.kiwi.flightoffers.model.Flight
+import com.kiwi.flightoffers.model.utils.getCurrencyAsSymbol
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.content_main.*
+import kotlinx.android.synthetic.main.loading_main.*
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -26,40 +33,49 @@ class MainActivity : BaseActivity() {
         private const val ARG_FLIGHTS = "flights"
     }
 
-
-    /**
-     * The [android.support.v4.view.PagerAdapter] that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * [android.support.v4.app.FragmentStatePagerAdapter].
-     */
     private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         setSupportActionBar(toolbar)
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
-        // Set up the ViewPager with the sections adapter.
-        container.adapter = mSectionsPagerAdapter
+        flightPager.adapter = mSectionsPagerAdapter
+        flightPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener {
+            override fun onPageScrollStateChanged(state: Int) {
+                //do nothing
+            }
 
-        savedInstanceState?.let {
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {
+                //do nothing
+            }
+
+            override fun onPageSelected(position: Int) {
+                val flight = mSectionsPagerAdapter?.flights?.get(position)
+                flight?.let {
+                    duration.text = it.fly_duration
+                }
+            }
+        })
+
+        if(savedInstanceState != null)
             mSectionsPagerAdapter?.flights = savedInstanceState.get(ARG_FLIGHTS) as List<Flight>
-        }
+        else if (sharedPreferences.getString(ARG_FLIGHTS, null) != null)
+            mSectionsPagerAdapter?.flights = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type)
 
         if (mSectionsPagerAdapter?.flights?.isEmpty() == true) {
             showLoading()
-            skypickerApi.getFlightOffers().enqueue(object : Callback<CollectionResponse<Flight>> {
+            val dateFrom = SkypickerAPIUtils.getCurrentDateString()
+            val dateTo = SkypickerAPIUtils.getNextMonthString()
+            skypickerApi.getFlightOffers(dateFrom, dateTo).enqueue(object : Callback<CollectionResponse<Flight>> {
                 override fun onResponse(call: Call<CollectionResponse<Flight>>, response: Response<CollectionResponse<Flight>>) {
                     Log.d(TAG, response.toString())
                     hideLoading()
+                    sharedPreferences.edit().putString(ARG_FLIGHTS, gson.toJson(response.body().data).toString()).apply()
+                    mSectionsPagerAdapter?.currency = response.body().getCurrencyAsSymbol(this@MainActivity)
                     mSectionsPagerAdapter?.flights = response.body().data
                 }
 
@@ -68,8 +84,6 @@ class MainActivity : BaseActivity() {
                     hideLoading()
                 }
             })
-
-
         }
 
         fab.setOnClickListener { view ->
@@ -120,18 +134,21 @@ class MainActivity : BaseActivity() {
      */
     inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
 
+        var currency : String = resources.getString(R.string.currency_eur)
         var flights: List<Flight> = listOf()
             set(value) {
                 field = value
                 notifyDataSetChanged()
             }
 
+
+
         override fun getItem(position: Int): Fragment {
             // getItem is called to instantiate the fragment for the given page.
             // Return a FlightOfferFragment (defined as a static inner class below).
             val flight = flights[position]
 
-            return FlightOfferFragment.newInstance(flight)
+            return FlightOfferFragment.newInstance(flight, currency)
         }
 
         override fun getCount(): Int {

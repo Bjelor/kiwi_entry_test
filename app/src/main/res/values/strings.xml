@@ -4,5 +4,10 @@
     <string name="section_format">Hello World from section: %1$d</string>
 
     <string name="from_format">From: %1$s</string>
-    <string name="price_format">%1$s\$</string>
+    <string name="price_format">%1$s\ %2$s\</string>
+    <string name="cover_content_description">Destination image</string>
+
+    <string name="currency_eur">\u20ac</string>
+    <string name="currency_pound">\u00a3</string>
+    <string name="currency_dollar">\$</string>
 </resources>

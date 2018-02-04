@@ -1,7 +1,9 @@
 package com.kiwi.flightoffers.ui
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.google.gson.Gson
 import com.kiwi.flightoffers.App
 import com.kiwi.flightoffers.api.ImageApi
 import com.kiwi.flightoffers.api.SkypickerApi
@@ -20,6 +22,12 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var imageApi: ImageApi
+
+    @Inject
+    protected lateinit var sharedPreferences: SharedPreferences
+
+    @Inject
+    protected lateinit var gson: Gson
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

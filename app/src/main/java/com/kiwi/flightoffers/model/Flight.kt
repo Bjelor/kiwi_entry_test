@@ -15,6 +15,8 @@ data class Flight (
         val cityTo: String,
         val mapIdto: String,
         val price: String,
+        val currency: String,
+        val fly_duration: String,
         val aTimeUTC: String,
         val dTimeUTC: String
 ) : Serializable
