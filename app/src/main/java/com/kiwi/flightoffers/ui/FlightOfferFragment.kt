@@ -1,6 +1,5 @@
 package com.kiwi.flightoffers.ui
 
-import android.content.Context
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,12 +8,12 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.kiwi.flightoffers.R
 import com.kiwi.flightoffers.api.ImageAPIUtils
 import com.kiwi.flightoffers.model.Flight
 import kotlinx.android.synthetic.main.fragment_main.*
 import kotlinx.android.synthetic.main.fragment_main.view.*
-import com.bumptech.glide.request.transition.Transition
 
 
 /**

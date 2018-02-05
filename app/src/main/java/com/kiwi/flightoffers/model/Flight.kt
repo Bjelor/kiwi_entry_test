@@ -17,6 +17,15 @@ data class Flight (
         val price: String,
         val currency: String,
         val fly_duration: String,
+        val distance: String,
         val aTimeUTC: String,
         val dTimeUTC: String
-) : Serializable
+) : Serializable {
+
+    override fun equals(other: Any?): Boolean
+        = if (other is Flight)
+            other.mapIdto == this.mapIdto
+        else
+            false
+
+}

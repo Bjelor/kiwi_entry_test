@@ -29,4 +29,23 @@
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Small</item>
     </style>
 
+    <style name="BottomText">
+        <item name="android:layout_marginStart">@dimen/pager_margin_default</item>
+        <item name="android:layout_marginLeft">@dimen/pager_margin_default</item>
+        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.Small</item>
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
+    <style name="BottomTextLabel" parent="BottomText">
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ErrorText">
+        <item name="android:padding">@dimen/padding_default</item>
+        <item name="android:textAppearance">@android:style/TextAppearance.Holo.Large</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

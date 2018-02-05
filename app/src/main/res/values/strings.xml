@@ -10,4 +10,8 @@
     <string name="currency_eur">\u20ac</string>
     <string name="currency_pound">\u00a3</string>
     <string name="currency_dollar">\$</string>
+    <string name="duration_label">Total duration:</string>
+    <string name="distance_label">Distance:</string>
+    <string name="distance">%1$s\ km</string>
+    <string name="error">Something went wrong, please try again later</string>
 </resources>

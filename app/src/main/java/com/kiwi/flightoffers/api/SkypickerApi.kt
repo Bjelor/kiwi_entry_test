@@ -16,7 +16,7 @@ interface SkypickerApi {
         const val BASE_URL = "https://api.skypicker.com/"
     }
 
-    @GET("flights?v=2&sort=popularity&asc=0&locale=en&daysInDestinationFrom=&daysInDestinationTo=&affilid=&children=0&infants=0&to=anywhere&featureName=aggregateResults&typeFlight=oneway&returnFrom=&returnTo=&one_per_date=0&oneforcity=1&wait_for_refresh=0&adults=1&limit=5")
+    @GET("flights?v=2&sort=popularity&asc=0&locale=en&daysInDestinationFrom=&daysInDestinationTo=&affilid=&children=0&infants=0&to=anywhere&featureName=aggregateResults&typeFlight=oneway&returnFrom=&returnTo=&one_per_date=0&oneforcity=1&wait_for_refresh=0&adults=1&limit=45")
     fun getFlightOffers(
             @Query("dateFrom") dateFrom : String = "06/03/2018",
             @Query("dateTo") dateTo : String = "06/04/2018",

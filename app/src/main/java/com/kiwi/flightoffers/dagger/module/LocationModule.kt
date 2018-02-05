@@ -1,9 +1,7 @@
 package com.kiwi.flightoffers.dagger.module
 
-import dagger.Module
-import android.content.Context.LOCATION_SERVICE
 import android.location.LocationManager
-import android.content.Context.LOCATION_SERVICE
+import dagger.Module
 import javax.inject.Inject
 
 
@@ -16,6 +14,5 @@ class LocationModule {
 
     @Inject
     lateinit var locationManager : LocationManager
-
 
 }
