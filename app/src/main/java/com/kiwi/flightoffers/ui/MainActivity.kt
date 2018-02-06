@@ -51,7 +51,9 @@ class MainActivity : BaseActivity() {
             lastDate = savedInstanceState.getLong(ARG_LAST_DATE)
             fillPagerWithData(currency, flights)
         } else if (sharedPreferences.getString(ARG_FLIGHTS, null) != null) {
-            val flights : List<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type)
+            var flights : List<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type)
+            if(flights.size > 5)
+                flights = flights.subList(flights.size - 5, flights.size)
             val currency = sharedPreferences.getString(ARG_CURRENCY, null)
             lastDate = sharedPreferences.getLong(ARG_LAST_DATE, 0)
             fillPagerWithData(currency, flights)
@@ -70,11 +72,14 @@ class MainActivity : BaseActivity() {
                     lastDate = SkypickerAPIUtils.getCurrentDateLong()
                     val currency = response.body().getCurrencyAsSymbol(this@MainActivity)
                     val newFlights = response.body().data
-                    val flights: List<Flight> = getSortedFlightList(newFlights)
+                    val flights = filterFlightsAndSave(newFlights, currency)
 
-                    saveResponseInfo(flights, currency, lastDate)
-                    fillPagerWithData(currency, flights)
-                    flight_pager.currentItem = 0
+                    if(flights.isNotEmpty()) {
+                        fillPagerWithData(currency, flights)
+                        flight_pager.currentItem = 0
+                    } else {
+                        showError(getString(R.string.no_new_flights))
+                    }
                 }
 
                 override fun onFailure(call: Call<CollectionResponse<Flight>>, t: Throwable) {
@@ -92,22 +97,27 @@ class MainActivity : BaseActivity() {
         }
     }
 
-    private fun getSortedFlightList(newFlights: List<Flight>): List<Flight> {
-        val oldFlights: List<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type) ?: listOf()
+    private fun filterFlightsAndSave(newFlights: List<Flight>, currency: String): List<Flight> {
+        val oldFlights: MutableList<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<MutableList<Flight>>() {}.type)
+                ?: mutableListOf()
         val flights: MutableList<Flight> = mutableListOf()
 
         if (oldFlights.isNotEmpty()) {
             var index = 0
             while (flights.size < 5 && index < newFlights.size) {
                 val flight = newFlights[index]
-                if(!oldFlights.contains(flight) && !flights.contains(flight))
+                if (!oldFlights.contains(flight) && !flights.contains(flight)) {
                     flights.add(flight)
+                    oldFlights.add(flight)
+                }
                 index++
             }
         } else {
             val index = if (newFlights.size > 5) 4 else newFlights.lastIndex
             flights.addAll(newFlights.subList(0, index))
         }
+
+        saveResponseInfo(oldFlights, currency, lastDate)
         return flights.toList()
     }
 
@@ -167,7 +177,8 @@ class MainActivity : BaseActivity() {
         loading_container.visibility = View.GONE
     }
 
-    private fun showError() {
+    private fun showError(message : String = getString(R.string.error)) {
+        error_message.text = message
         error_container.visibility = View.VISIBLE
     }
 
