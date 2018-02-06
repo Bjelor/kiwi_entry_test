@@ -28,6 +28,8 @@ class MainActivity : BaseActivity() {
     companion object {
         private val TAG = MainActivity::class.java.simpleName
 
+        private const val FLIGHTS_COUNT = 5
+
         private const val ARG_FLIGHTS = "flights"
         private const val ARG_CURRENCY = "currency"
         private const val ARG_LAST_DATE = "ladt_date"
@@ -46,48 +48,14 @@ class MainActivity : BaseActivity() {
         initPager()
 
         if(savedInstanceState != null) {
-            val flights : List<Flight> = savedInstanceState.get(ARG_FLIGHTS) as List<Flight>
-            val currency = savedInstanceState.getString(ARG_CURRENCY)
-            lastDate = savedInstanceState.getLong(ARG_LAST_DATE)
-            fillPagerWithData(currency, flights)
+            restoreFromSavedInstanceState(savedInstanceState)
         } else if (sharedPreferences.getString(ARG_FLIGHTS, null) != null) {
-            var flights : List<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type)
-            if(flights.size > 5)
-                flights = flights.subList(flights.size - 5, flights.size)
-            val currency = sharedPreferences.getString(ARG_CURRENCY, null)
-            lastDate = sharedPreferences.getLong(ARG_LAST_DATE, 0)
-            fillPagerWithData(currency, flights)
+            restoreFromSharedPreferences()
         }
 
-        if (flightsPagerAdapter?.flights?.isEmpty() == true || !SkypickerAPIUtils.isDateToday(lastDate)) {
+        if (areCurrentFlightsInvalid()) {
             showLoading()
-
-            val currentDate = SkypickerAPIUtils.getCurrentDateString()
-            skypickerApi.getFlightOffers(currentDate, currentDate).enqueue(object : Callback<CollectionResponse<Flight>> {
-                override fun onResponse(call: Call<CollectionResponse<Flight>>, response: Response<CollectionResponse<Flight>>) {
-                    Log.d(TAG, response.toString())
-                    hideLoading()
-                    hideError()
-
-                    lastDate = SkypickerAPIUtils.getCurrentDateLong()
-                    val currency = response.body().getCurrencyAsSymbol(this@MainActivity)
-                    val newFlights = response.body().data
-                    val flights = filterFlightsAndSave(newFlights, currency)
-
-                    if(flights.isNotEmpty()) {
-                        fillPagerWithData(currency, flights)
-                        flight_pager.currentItem = 0
-                    } else {
-                        showError(getString(R.string.no_new_flights))
-                    }
-                }
-
-                override fun onFailure(call: Call<CollectionResponse<Flight>>, t: Throwable) {
-                    Log.e(TAG, t.message)
-                    hideLoading()
-                    showError()
-                }
-            })
+            loadNewFlights()
         }
 
         fab.setOnClickListener { view ->
@@ -97,6 +65,54 @@ class MainActivity : BaseActivity() {
         }
     }
 
+    private fun loadNewFlights() {
+        val currentDate = SkypickerAPIUtils.getCurrentDateString()
+        skypickerApi.getFlightOffers(currentDate, currentDate).enqueue(object : Callback<CollectionResponse<Flight>> {
+            override fun onResponse(call: Call<CollectionResponse<Flight>>, response: Response<CollectionResponse<Flight>>) {
+                Log.d(TAG, response.toString())
+                hideLoading()
+                hideError()
+
+                lastDate = SkypickerAPIUtils.getCurrentDateLong()
+                val currency = response.body().getCurrencyAsSymbol(this@MainActivity)
+                val newFlights = response.body().data
+                val flights = filterFlightsAndSave(newFlights, currency)
+
+                if (flights.isNotEmpty()) {
+                    fillPagerWithData(currency, flights)
+                    flight_pager.currentItem = 0
+                } else {
+                    showError(getString(R.string.no_new_flights))
+                }
+            }
+
+            override fun onFailure(call: Call<CollectionResponse<Flight>>, t: Throwable) {
+                Log.e(TAG, t.message)
+                hideLoading()
+                showError()
+            }
+        })
+    }
+
+    private fun areCurrentFlightsInvalid() =
+            flightsPagerAdapter?.flights?.isEmpty() == true || !SkypickerAPIUtils.isDateToday(lastDate)
+
+    private fun restoreFromSharedPreferences() {
+        var flights: List<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<List<Flight>>() {}.type)
+        if (flights.size > FLIGHTS_COUNT)
+            flights = flights.subList(flights.size - FLIGHTS_COUNT, flights.size)
+        val currency = sharedPreferences.getString(ARG_CURRENCY, null)
+        lastDate = sharedPreferences.getLong(ARG_LAST_DATE, 0)
+        fillPagerWithData(currency, flights)
+    }
+
+    private fun restoreFromSavedInstanceState(savedInstanceState: Bundle) {
+        val flights: List<Flight> = savedInstanceState.get(ARG_FLIGHTS) as List<Flight>
+        val currency = savedInstanceState.getString(ARG_CURRENCY)
+        lastDate = savedInstanceState.getLong(ARG_LAST_DATE)
+        fillPagerWithData(currency, flights)
+    }
+
     private fun filterFlightsAndSave(newFlights: List<Flight>, currency: String): List<Flight> {
         val oldFlights: MutableList<Flight> = gson.fromJson(sharedPreferences.getString(ARG_FLIGHTS, null), object : TypeToken<MutableList<Flight>>() {}.type)
                 ?: mutableListOf()
@@ -104,7 +120,7 @@ class MainActivity : BaseActivity() {
 
         if (oldFlights.isNotEmpty()) {
             var index = 0
-            while (flights.size < 5 && index < newFlights.size) {
+            while (flights.size < FLIGHTS_COUNT && index < newFlights.size) {
                 val flight = newFlights[index]
                 if (!oldFlights.contains(flight) && !flights.contains(flight)) {
                     flights.add(flight)
@@ -113,8 +129,9 @@ class MainActivity : BaseActivity() {
                 index++
             }
         } else {
-            val index = if (newFlights.size > 5) 4 else newFlights.lastIndex
+            val index = if (newFlights.size > FLIGHTS_COUNT) FLIGHTS_COUNT else newFlights.lastIndex
             flights.addAll(newFlights.subList(0, index))
+            oldFlights.addAll(flights)
         }
 
         saveResponseInfo(oldFlights, currency, lastDate)
