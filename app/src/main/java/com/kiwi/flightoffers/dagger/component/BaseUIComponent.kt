@@ -1,8 +1,5 @@
 package com.kiwi.flightoffers.dagger.component
 
-import android.support.v4.app.Fragment
-import com.kiwi.flightoffers.api.ImageApi
-import com.kiwi.flightoffers.api.SkypickerApi
 import com.kiwi.flightoffers.dagger.UIScope
 import com.kiwi.flightoffers.ui.BaseActivity
 import com.kiwi.flightoffers.ui.BaseFragment
@@ -16,9 +13,6 @@ import dagger.Component
 @UIScope
 @Component(dependencies = arrayOf(AppComponent::class))
 interface BaseUIComponent {
-
-    fun skypickerApi(): SkypickerApi
-    fun imageApi(): ImageApi
 
     fun inject(activity: BaseActivity)
 

@@ -1,6 +1,7 @@
 package com.kiwi.flightoffers.ui
 
 import android.content.SharedPreferences
+import android.location.LocationManager
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import com.google.gson.Gson
@@ -28,6 +29,9 @@ abstract class BaseActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var gson: Gson
+
+    @Inject
+    protected lateinit var locationManager: LocationManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

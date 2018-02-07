@@ -3,6 +3,7 @@ package com.kiwi.flightoffers.dagger.component
 import android.app.Application
 import android.content.SharedPreferences
 import android.content.res.Resources
+import android.location.LocationManager
 import com.google.gson.Gson
 import com.kiwi.flightoffers.api.ImageApi
 import com.kiwi.flightoffers.api.SkypickerApi
@@ -28,6 +29,7 @@ interface AppComponent {
     fun resources(): Resources
     fun sharedPreferences() : SharedPreferences
     fun gson(): Gson
+    fun locationManager() : LocationManager
 
     fun skypickerApi(): SkypickerApi
     fun imageApi(): ImageApi

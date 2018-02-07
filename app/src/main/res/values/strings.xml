@@ -15,4 +15,5 @@
     <string name="distance">%1$s\ km</string>
     <string name="error">Something went wrong, please try again later</string>
     <string name="no_new_flights">No new flights available right now, please try again later</string>
+    <string name="loading_location">Designating your approximate location\nPlease wait</string>
 </resources>

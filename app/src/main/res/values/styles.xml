@@ -42,9 +42,10 @@
     </style>
 
     <style name="ErrorText">
+        <item name="android:gravity">center</item>
         <item name="android:padding">@dimen/padding_default</item>
         <item name="android:textAppearance">@android:style/TextAppearance.Holo.Large</item>
-        <item name="android:textColor">@android:color/black</item>
+        <item name="android:textColor">@android:color/darker_gray</item>
         <item name="android:textStyle">bold</item>
     </style>
 
